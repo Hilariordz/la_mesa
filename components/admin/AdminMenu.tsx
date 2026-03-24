@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { createClient } from "@/lib/supabase-client";
 import toast from "react-hot-toast";
 
 type Category = { id: string; name: string; emoji: string };
@@ -28,14 +27,21 @@ export default function AdminMenu() {
   const [filterCat, setFilterCat] = useState("all");
 
   const fetchData = useCallback(async () => {
-    const supabase = createClient();
-    const [cats, its] = await Promise.all([
-      supabase.from("categories").select("*").eq("active", true).order("sort_order"),
-      supabase.from("menu_items").select("*").order("name"),
-    ]);
-    setCategories(cats.data ?? []);
-    setItems(its.data ?? []);
-    setLoading(false);
+    try {
+      const [catsRes, itsRes] = await Promise.all([
+        fetch("/api/admin/categories"),
+        fetch("/api/admin/menu"),
+      ]);
+      const [catsData, itsData] = await Promise.all([catsRes.json(), itsRes.json()]);
+      if (!catsData.ok) toast.error("Error al cargar categorías: " + catsData.message);
+      if (!itsData.ok) toast.error("Error al cargar platillos: " + itsData.message);
+      setCategories(catsData.ok ? catsData.data : []);
+      setItems(itsData.ok ? itsData.data : []);
+    } catch (e) {
+      toast.error("Error de conexión al cargar el menú");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => { fetchData(); }, [fetchData]);

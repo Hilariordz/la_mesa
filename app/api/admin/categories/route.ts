@@ -7,7 +7,11 @@ export async function GET(req: Request) {
   if (authErr) return authErr;
 
   const supabase = getSupabaseAdminClient();
-  const { data, error } = await supabase.from("menu_items").select("*").order("name");
+  const { data, error } = await supabase
+    .from("categories")
+    .select("*")
+    .order("sort_order");
+
   if (error) return NextResponse.json({ ok: false, message: error.message }, { status: 500 });
   return NextResponse.json({ ok: true, data: data ?? [] });
 }
@@ -17,15 +21,14 @@ export async function POST(req: Request) {
   if (authErr) return authErr;
 
   try {
-    const body = await req.json();
-    const { name, description, price, image_url, category_id, available } = body;
-    if (!name || !price || !category_id) {
-      return NextResponse.json({ ok: false, message: "Datos incompletos" }, { status: 400 });
-    }
+    const { name, emoji, sort_order } = await req.json();
+    if (!name) return NextResponse.json({ ok: false, message: "Nombre requerido" }, { status: 400 });
+
     const supabase = getSupabaseAdminClient();
     const { error } = await supabase
-      .from("menu_items")
-      .insert({ name, description, price, image_url, category_id, available: available ?? true });
+      .from("categories")
+      .insert({ name, emoji: emoji || "🍽️", sort_order: sort_order ?? 0, active: true });
+
     if (error) return NextResponse.json({ ok: false, message: error.message }, { status: 500 });
     return NextResponse.json({ ok: true });
   } catch {
@@ -42,7 +45,7 @@ export async function PATCH(req: Request) {
     if (!id) return NextResponse.json({ ok: false, message: "ID requerido" }, { status: 400 });
 
     const supabase = getSupabaseAdminClient();
-    const { error } = await supabase.from("menu_items").update(fields).eq("id", id);
+    const { error } = await supabase.from("categories").update(fields).eq("id", id);
     if (error) return NextResponse.json({ ok: false, message: error.message }, { status: 500 });
     return NextResponse.json({ ok: true });
   } catch {
@@ -60,7 +63,7 @@ export async function DELETE(req: Request) {
     if (!id) return NextResponse.json({ ok: false, message: "ID requerido" }, { status: 400 });
 
     const supabase = getSupabaseAdminClient();
-    const { error } = await supabase.from("menu_items").delete().eq("id", id);
+    const { error } = await supabase.from("categories").delete().eq("id", id);
     if (error) return NextResponse.json({ ok: false, message: error.message }, { status: 500 });
     return NextResponse.json({ ok: true });
   } catch {

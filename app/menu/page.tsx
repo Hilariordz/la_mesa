@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase-client";
 import Navbar from "@/components/Navbar";
 import CartDrawer from "@/components/CartDrawer";
 import { useCart } from "@/lib/cart-store";
@@ -26,15 +25,14 @@ export default function MenuPage() {
   const { addItem, totalItems, totalPrice } = useCart();
 
   useEffect(() => {
-    const supabase = createClient();
     Promise.all([
-      supabase.from("categories").select("*").eq("active", true).order("sort_order"),
-      supabase.from("menu_items").select("*").eq("available", true).order("name"),
+      fetch("/api/menu?type=categories").then((r) => r.ok ? r.json() : { ok: false, data: [] }),
+      fetch("/api/menu?type=items").then((r) => r.ok ? r.json() : { ok: false, data: [] }),
     ]).then(([cats, its]) => {
       setCategories(cats.data ?? []);
       setItems(its.data ?? []);
       setLoading(false);
-    });
+    }).catch(() => setLoading(false));
   }, []);
 
   const allCategories = [{ id: "all", name: "Todo", emoji: "✨" }, ...categories];

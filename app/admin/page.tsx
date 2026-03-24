@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 import AdminOrders from "@/components/admin/AdminOrders";
 import AdminReservations from "@/components/admin/AdminReservations";
 import AdminMenu from "@/components/admin/AdminMenu";
+import AdminCategories from "@/components/admin/AdminCategories";
 
-type Tab = "orders" | "reservations" | "menu";
+type Tab = "orders" | "reservations" | "menu" | "categories";
 
 export default function AdminPage() {
   const router = useRouter();
@@ -91,9 +92,10 @@ export default function AdminPage() {
   }
 
   const TABS: { key: Tab; label: string; icon: string }[] = [
-    { key: "orders",       label: "Pedidos",  icon: "📋" },
-    { key: "reservations", label: "Reservas", icon: "🪑" },
-    { key: "menu",         label: "Menú",     icon: "🍽️" },
+    { key: "orders",       label: "Pedidos",     icon: "📋" },
+    { key: "reservations", label: "Reservas",    icon: "🪑" },
+    { key: "menu",         label: "Menú",        icon: "🍽️" },
+    { key: "categories",   label: "Categorías",  icon: "🗂️" },
   ];
 
   return (
@@ -142,6 +144,7 @@ export default function AdminPage() {
         {tab === "orders"       && <AdminOrders />}
         {tab === "reservations" && <AdminReservations />}
         {tab === "menu"         && <AdminMenu />}
+        {tab === "categories"   && <AdminCategories />}
       </div>
     </main>
   );
