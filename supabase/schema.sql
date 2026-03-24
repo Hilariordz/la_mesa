@@ -80,6 +80,7 @@ begin
 end;
 $$ language plpgsql;
 
+drop trigger if exists orders_updated_at on orders;
 create trigger orders_updated_at
   before update on orders
   for each row execute function update_updated_at();
@@ -106,6 +107,50 @@ create policy "select order_items" on order_items for select using (true);
 -- Reservas
 create policy "insert reservations" on reservations for insert with check (true);
 create policy "select own reservations" on reservations for select using (auth.uid() = user_id or user_id is null);
+
+-- Perfil público de usuario (evita fallos al crear cuentas si existe trigger en auth.users)
+create table if not exists profiles (
+  id uuid primary key references auth.users(id) on delete cascade,
+  full_name text,
+  email text unique,
+  role text not null default 'user' check (role in ('user', 'admin')),
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+alter table profiles enable row level security;
+
+create policy "select own profile" on profiles
+  for select using (auth.uid() = id);
+
+create policy "insert own profile" on profiles
+  for insert with check (auth.uid() = id);
+
+create policy "update own profile" on profiles
+  for update using (auth.uid() = id);
+
+create or replace function public.handle_new_user()
+returns trigger as $$
+begin
+  insert into public.profiles (id, full_name, email)
+  values (
+    new.id,
+    coalesce(new.raw_user_meta_data ->> 'full_name', new.raw_user_meta_data ->> 'name', ''),
+    new.email
+  )
+  on conflict (id) do update set
+    full_name = excluded.full_name,
+    email = excluded.email,
+    updated_at = now();
+
+  return new;
+end;
+$$ language plpgsql security definer;
+
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute function public.handle_new_user();
 
 -- Seed: categorías base
 insert into categories (name, emoji, sort_order) values

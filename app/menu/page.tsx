@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase-client";
+import Navbar from "@/components/Navbar";
 import CartDrawer from "@/components/CartDrawer";
 import { useCart } from "@/lib/cart-store";
 
@@ -17,30 +17,16 @@ type MenuItem = {
   category_id: string;
 };
 
-const NAV_LINKS = [
-  { href: "/",         label: "Home" },
-  { href: "/menu",     label: "Menú" },
-  { href: "/reservar", label: "Reservar" },
-  { href: "/pedidos",  label: "Pedidos" },
-];
-
 export default function MenuPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [items, setItems] = useState<MenuItem[]>([]);
   const [activeCategory, setActiveCategory] = useState("all");
   const [loading, setLoading] = useState(true);
   const [cartOpen, setCartOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [user, setUser] = useState<{ email?: string } | null>(null);
   const { addItem, totalItems, totalPrice } = useCart();
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null));
-    const { data: listener } = supabase.auth.onAuthStateChange((_e, session) => {
-      setUser(session?.user ?? null);
-    });
     Promise.all([
       supabase.from("categories").select("*").eq("active", true).order("sort_order"),
       supabase.from("menu_items").select("*").eq("available", true).order("name"),
@@ -49,18 +35,7 @@ export default function MenuPage() {
       setItems(its.data ?? []);
       setLoading(false);
     });
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      listener.subscription.unsubscribe();
-    };
   }, []);
-
-  const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
-    window.location.href = "/";
-  };
 
   const allCategories = [{ id: "all", name: "Todo", emoji: "✨" }, ...categories];
   const filtered = activeCategory === "all"
@@ -69,86 +44,7 @@ export default function MenuPage() {
 
   return (
     <>
-      {/* ── Navbar (landing style) ── */}
-      <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled ? "glass border-b border-[var(--border)] py-0" : "bg-transparent py-2"
-        }`}
-      >
-        <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between gap-8">
-          <Link href="/" className="font-display text-xl font-bold italic text-white hover:text-[var(--accent-light)] transition-colors flex-shrink-0">
-            La Mesa
-          </Link>
-
-          <nav className="hidden md:flex items-center gap-1">
-            {NAV_LINKS.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="relative px-4 py-2 text-sm text-white/70 hover:text-white transition-colors group"
-              >
-                {item.label}
-                <span className="absolute bottom-1 left-4 right-4 h-px bg-[var(--accent)] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
-              </Link>
-            ))}
-          </nav>
-
-          <div className="hidden md:flex items-center gap-3 flex-shrink-0">
-            {user ? (
-              <button onClick={handleLogout} className="text-sm text-white/60 hover:text-white transition-colors">
-                Salir
-              </button>
-            ) : (
-              <>
-                <Link href="/login" className="px-5 py-2 text-sm font-medium text-white border border-white/25 rounded-full hover:border-white/60 transition-all duration-200">
-                  Iniciar sesión
-                </Link>
-                <Link href="/register" className="btn-primary text-sm py-2 px-5">
-                  Registrarse
-                </Link>
-              </>
-            )}
-          </div>
-
-          <button
-            onClick={() => setMenuOpen((v) => !v)}
-            className="md:hidden flex flex-col gap-1.5 p-2"
-            aria-label="Abrir menú"
-          >
-            <span className={`w-5 h-px bg-white transition-all duration-300 ${menuOpen ? "rotate-45 translate-y-2" : ""}`} />
-            <span className={`w-5 h-px bg-white transition-all duration-300 ${menuOpen ? "opacity-0" : ""}`} />
-            <span className={`w-5 h-px bg-white transition-all duration-300 ${menuOpen ? "-rotate-45 -translate-y-2" : ""}`} />
-          </button>
-        </div>
-
-        {/* Mobile dropdown */}
-        <div className={`md:hidden overflow-hidden transition-all duration-300 glass ${menuOpen ? "max-h-96 border-t border-[var(--border)]" : "max-h-0"}`}>
-          <div className="px-6 py-4 flex flex-col gap-1">
-            {NAV_LINKS.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setMenuOpen(false)}
-                className="py-3 text-sm text-white/70 hover:text-white border-b border-[var(--border)] last:border-0 transition-colors"
-              >
-                {item.label}
-              </Link>
-            ))}
-            {!user && (
-              <div className="flex gap-3 pt-4">
-                <Link href="/login" onClick={() => setMenuOpen(false)}
-                  className="flex-1 text-center py-2.5 text-sm border border-white/25 rounded-full text-white/70 hover:text-white transition-all">
-                  Iniciar sesión
-                </Link>
-                <Link href="/register" onClick={() => setMenuOpen(false)}
-                  className="flex-1 text-center btn-primary text-sm py-2.5">
-                  Registrarse
-                </Link>
-              </div>
-            )}
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       {/* ── Content ── */}
       <main className="pt-14 pb-32 min-h-screen" style={{ background: "var(--bg)" }}>

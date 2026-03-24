@@ -15,10 +15,31 @@ export default function AdminPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [tab, setTab] = useState<Tab>("orders");
+  const [pendingReservationsCount, setPendingReservationsCount] = useState(0);
 
   useEffect(() => {
     fetch("/api/admin/check").then((r) => { if (r.ok) setAuthed(true); });
   }, []);
+
+  useEffect(() => {
+    if (!authed) return;
+
+    const loadPendingCount = async () => {
+      try {
+        const res = await fetch("/api/admin/reservations?status=pending");
+        const data = await res.json();
+        if (res.ok && data.ok) {
+          setPendingReservationsCount(Array.isArray(data.data) ? data.data.length : 0);
+        }
+      } catch {
+        // ignore badge refresh errors
+      }
+    };
+
+    loadPendingCount();
+    const interval = setInterval(loadPendingCount, 10000);
+    return () => clearInterval(interval);
+  }, [authed]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -102,7 +123,14 @@ export default function AdminPage() {
             }`}
           >
             <span className="text-lg">{t.icon}</span>
-            <span className="tracking-wide">{t.label}</span>
+            <span className="tracking-wide flex items-center gap-1">
+              {t.label}
+              {t.key === "reservations" && pendingReservationsCount > 0 && (
+                <span className="min-w-5 h-5 px-1 rounded-full bg-[var(--accent)] text-white text-[10px] font-semibold leading-5">
+                  {pendingReservationsCount > 99 ? "99+" : pendingReservationsCount}
+                </span>
+              )}
+            </span>
             {tab === t.key && (
               <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full bg-[var(--accent)]" />
             )}

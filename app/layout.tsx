@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { Toaster } from "react-hot-toast";
+import SplashScreen from "@/components/SplashScreen";
 import "./globals.css";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
@@ -31,6 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3075/3075977.png" />
       </head>
       <body className="min-h-screen bg-[var(--bg)] text-[var(--text)] antialiased">
+        <SplashScreen />
         {children}
         <Toaster
           position="top-center"

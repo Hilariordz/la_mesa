@@ -25,6 +25,7 @@ export default function AdminMenu() {
   const [editId, setEditId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [filterCat, setFilterCat] = useState("all");
 
   const fetchData = useCallback(async () => {
     const supabase = createClient();
@@ -111,15 +112,24 @@ export default function AdminMenu() {
     }
   };
 
-  const catName = (id: string) => categories.find((c) => c.id === id)?.name ?? "";
+  const catName = (id: string) => categories.find((c) => c.id === id);
+  const filtered = filterCat === "all" ? items : items.filter((i) => i.category_id === filterCat);
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="font-bold text-[var(--text)]">Menú</h2>
+      {/* Toolbar */}
+      <div className="flex items-center justify-between mb-5">
+        <div>
+          <h2 className="font-display text-lg font-bold italic text-[var(--text)]">Menú</h2>
+          <p className="text-xs text-[var(--text-muted)]">{items.length} {items.length === 1 ? "platillo" : "platillos"}</p>
+        </div>
         <button
           onClick={() => { setForm(EMPTY_FORM); setEditId(null); setShowForm((v) => !v); }}
-          className="px-4 py-1.5 rounded-full text-xs bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)] transition-colors"
+          className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all ${
+            showForm
+              ? "bg-[var(--surface2)] text-[var(--text-muted)]"
+              : "bg-[var(--accent)] text-white shadow-[0_4px_12px_rgba(200,146,42,0.3)]"
+          }`}
         >
           {showForm ? "Cancelar" : "+ Agregar"}
         </button>
@@ -127,22 +137,24 @@ export default function AdminMenu() {
 
       {/* Form */}
       {showForm && (
-        <form onSubmit={handleSave} className="bg-[var(--surface)] rounded-2xl p-4 border border-[var(--border)] mb-6 flex flex-col gap-3">
-          <h3 className="text-sm font-semibold text-[var(--text)]">{editId ? "Editar item" : "Nuevo item"}</h3>
+        <form onSubmit={handleSave} className="bg-[var(--surface)] rounded-2xl p-4 border border-[var(--border)] mb-5 flex flex-col gap-3">
+          <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-widest">
+            {editId ? "Editar platillo" : "Nuevo platillo"}
+          </p>
 
           <input
             placeholder="Nombre *"
             value={form.name}
             onChange={(e) => set("name", e.target.value)}
             required
-            className="input-sm"
+            className="input text-sm py-2.5"
           />
           <textarea
             placeholder="Descripción"
             value={form.description}
             onChange={(e) => set("description", e.target.value)}
             rows={2}
-            className="input-sm resize-none"
+            className="input text-sm py-2.5 resize-none"
           />
           <div className="grid grid-cols-2 gap-3">
             <input
@@ -153,13 +165,13 @@ export default function AdminMenu() {
               step="0.01"
               min="0"
               required
-              className="input-sm"
+              className="input text-sm py-2.5"
             />
             <select
               value={form.category_id}
               onChange={(e) => set("category_id", e.target.value)}
               required
-              className="input-sm"
+              className="input text-sm py-2.5"
             >
               <option value="">Categoría *</option>
               {categories.map((c) => (
@@ -171,96 +183,129 @@ export default function AdminMenu() {
             placeholder="URL de imagen (opcional)"
             value={form.image_url}
             onChange={(e) => set("image_url", e.target.value)}
-            className="input-sm"
+            className="input text-sm py-2.5"
           />
-          <label className="flex items-center gap-2 text-sm text-[var(--text-muted)] cursor-pointer">
+          <label className="flex items-center gap-2.5 text-sm text-[var(--text-muted)] cursor-pointer select-none">
             <input
               type="checkbox"
               checked={form.available}
               onChange={(e) => set("available", e.target.checked)}
-              className="accent-[var(--accent)]"
+              className="accent-[var(--accent)] w-4 h-4"
             />
-            Disponible
+            Disponible en menú
           </label>
           <button
             type="submit"
             disabled={saving}
-            className="w-full bg-[var(--accent)] text-white rounded-full py-2.5 text-sm font-semibold disabled:opacity-50"
+            className="btn-primary w-full text-sm py-2.5"
           >
-            {saving ? "Guardando..." : editId ? "Actualizar" : "Crear item"}
+            {saving ? (
+              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            ) : editId ? "Actualizar platillo" : "Crear platillo"}
           </button>
         </form>
       )}
 
-      {loading && <p className="text-[var(--text-muted)] text-sm animate-pulse">Cargando...</p>}
-
-      <div className="flex flex-col gap-3">
-        {items.map((item) => (
-          <div
-            key={item.id}
-            className={`bg-[var(--surface)] rounded-2xl p-4 border transition-colors ${
-              item.available ? "border-[var(--border)]" : "border-[var(--border)] opacity-50"
+      {/* Category filter */}
+      {!loading && categories.length > 0 && (
+        <div className="flex gap-1.5 mb-4 overflow-x-auto no-scrollbar">
+          <button
+            onClick={() => setFilterCat("all")}
+            className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 transition-all ${
+              filterCat === "all"
+                ? "bg-[var(--accent)] text-white"
+                : "bg-[var(--surface2)] text-[var(--text-muted)] hover:text-[var(--text)]"
             }`}
           >
-            <div className="flex items-start gap-3">
-              {item.image_url ? (
-                <img src={item.image_url} alt={item.name} className="w-14 h-14 rounded-xl object-cover flex-shrink-0" />
-              ) : (
-                <div className="w-14 h-14 rounded-xl bg-[var(--surface2)] flex items-center justify-center text-2xl flex-shrink-0">🍽️</div>
-              )}
+            Todo
+          </button>
+          {categories.map((c) => (
+            <button
+              key={c.id}
+              onClick={() => setFilterCat(c.id)}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 transition-all ${
+                filterCat === c.id
+                  ? "bg-[var(--accent)] text-white"
+                  : "bg-[var(--surface2)] text-[var(--text-muted)] hover:text-[var(--text)]"
+              }`}
+            >
+              {c.emoji} {c.name}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {loading && (
+        <div className="flex flex-col gap-3">
+          {[1, 2, 3].map((i) => <div key={i} className="skeleton h-20 rounded-2xl" />)}
+        </div>
+      )}
+
+      <div className="flex flex-col gap-2">
+        {filtered.map((item) => {
+          const cat = catName(item.category_id);
+          return (
+            <div
+              key={item.id}
+              className={`bg-[var(--surface)] rounded-2xl border p-3 flex items-center gap-3 transition-all ${
+                item.available ? "border-[var(--border)]" : "border-[var(--border)] opacity-50"
+              }`}
+            >
+              {/* Thumbnail */}
+              <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-[var(--surface2)] flex items-center justify-center text-xl">
+                {item.image_url
+                  ? <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
+                  : <span>{cat?.emoji ?? "🍽️"}</span>
+                }
+              </div>
+
+              {/* Info */}
               <div className="flex-1 min-w-0">
-                <div className="flex justify-between items-start">
-                  <p className="font-semibold text-sm text-[var(--text)]">{item.name}</p>
-                  <p className="text-sm font-bold text-[var(--accent)] ml-2">${item.price.toFixed(2)}</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-semibold text-[var(--text)] truncate">{item.name}</p>
+                  {!item.available && (
+                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-[var(--surface2)] text-[var(--text-subtle)] flex-shrink-0">
+                      Inactivo
+                    </span>
+                  )}
                 </div>
-                <p className="text-xs text-[var(--text-muted)]">{catName(item.category_id)}</p>
-                {item.description && (
-                  <p className="text-xs text-[var(--text-subtle)] mt-0.5 line-clamp-1">{item.description}</p>
-                )}
+                <p className="text-xs text-[var(--text-muted)]">
+                  {cat ? `${cat.emoji} ${cat.name}` : "—"} · <span className="text-[var(--accent-light)] font-semibold">${item.price.toFixed(2)}</span>
+                </p>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center gap-1.5 flex-shrink-0">
+                <button
+                  onClick={() => handleToggle(item)}
+                  title={item.available ? "Desactivar" : "Activar"}
+                  className={`w-8 h-8 rounded-lg text-xs flex items-center justify-center transition-colors ${
+                    item.available
+                      ? "bg-[var(--surface2)] text-[var(--text-muted)] hover:text-[var(--red)]"
+                      : "bg-[var(--green-dim)] text-[var(--green)]"
+                  }`}
+                >
+                  {item.available ? "○" : "●"}
+                </button>
+                <button
+                  onClick={() => handleEdit(item)}
+                  title="Editar"
+                  className="w-8 h-8 rounded-lg text-xs bg-[var(--surface2)] text-[var(--text-muted)] hover:text-[var(--accent)] flex items-center justify-center transition-colors"
+                >
+                  ✎
+                </button>
+                <button
+                  onClick={() => handleDelete(item.id)}
+                  title="Eliminar"
+                  className="w-8 h-8 rounded-lg text-xs bg-[var(--red-dim)] text-[var(--red)] hover:bg-[var(--red)] hover:text-white flex items-center justify-center transition-colors"
+                >
+                  ✕
+                </button>
               </div>
             </div>
-            <div className="flex gap-2 mt-3">
-              <button
-                onClick={() => handleToggle(item)}
-                className={`flex-1 py-1.5 rounded-xl text-xs font-medium transition-colors ${
-                  item.available
-                    ? "bg-[var(--surface2)] text-[var(--text-muted)] hover:text-red-400"
-                    : "bg-green-500/20 text-green-400"
-                }`}
-              >
-                {item.available ? "Desactivar" : "Activar"}
-              </button>
-              <button
-                onClick={() => handleEdit(item)}
-                className="flex-1 py-1.5 rounded-xl text-xs font-medium bg-[var(--surface2)] text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors"
-              >
-                Editar
-              </button>
-              <button
-                onClick={() => handleDelete(item.id)}
-                className="px-3 py-1.5 rounded-xl text-xs font-medium bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors"
-              >
-                ✕
-              </button>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
-
-      <style jsx>{`
-        .input-sm {
-          width: 100%;
-          background: var(--surface2);
-          border: 1px solid var(--border);
-          border-radius: 10px;
-          padding: 8px 12px;
-          font-size: 13px;
-          color: var(--text);
-          outline: none;
-        }
-        .input-sm:focus { border-color: var(--accent); }
-        .input-sm option { background: var(--surface); }
-      `}</style>
     </div>
   );
 }
