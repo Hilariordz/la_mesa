@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import { usePushSubscription } from "@/lib/use-push";
 
 type Reservation = {
   id: string;
@@ -22,6 +23,7 @@ const STATUS_MAP: Record<string, { label: string; icon: string; color: string; b
 };
 
 export default function ReservasPage() {
+  usePushSubscription(false); // suscribir usuario a push
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
   const [unauthorized, setUnauthorized] = useState(false);

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import toast from "react-hot-toast";
+import { usePushSubscription } from "@/lib/use-push";
 
 type Reservation = {
   id: string;
@@ -30,6 +31,7 @@ const FILTERS = [
 ];
 
 export default function AdminReservations() {
+  usePushSubscription(true); // suscribir admin a push
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("pending");
@@ -66,6 +68,7 @@ export default function AdminReservations() {
         if (newOnes.length > 0) {
           toast.success(`${newOnes.length} nueva${newOnes.length > 1 ? "s" : ""} reserva${newOnes.length > 1 ? "s" : ""}`);
           playAlertSound();
+          if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
         }
       }
       knownIdsRef.current = new Set(next.map((r) => r.id));

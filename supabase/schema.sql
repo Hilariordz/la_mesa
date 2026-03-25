@@ -159,3 +159,18 @@ insert into categories (name, emoji, sort_order) values
   ('Postres', '🍰', 3),
   ('Bebidas', '🥤', 4)
 on conflict do nothing;
+
+-- Push subscriptions para notificaciones web
+create table if not exists push_subscriptions (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete cascade,
+  endpoint text not null unique,
+  p256dh text not null,
+  auth text not null,
+  is_admin boolean default false,
+  created_at timestamptz default now()
+);
+
+alter table push_subscriptions enable row level security;
+create policy "manage own push sub" on push_subscriptions
+  for all using (auth.uid() = user_id or is_admin = true);

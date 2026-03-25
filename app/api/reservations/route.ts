@@ -46,6 +46,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, message: error?.message ?? "Error" }, { status: 500 });
     }
 
+    // Notificar al admin via push
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL ? new URL(req.url).origin : ""}/api/push/notify-admin`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ customerName: customer_name, partySize: party_size, date, time }),
+      });
+    } catch { /* no-op */ }
+
     return NextResponse.json({ ok: true, reservationId: data.id });
   } catch {
     return NextResponse.json({ ok: false, message: "Error interno" }, { status: 500 });
