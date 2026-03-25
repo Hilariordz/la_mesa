@@ -29,7 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es" className={inter.variable}>
       <head>
-        <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3075/3075977.png" />
+        <link rel="apple-touch-icon" href="/icon-512.png" />
       </head>
       <body className="min-h-screen bg-[var(--bg)] text-[var(--text)] antialiased">
         <SplashScreen />

@@ -8,19 +8,20 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: "/",
     display: "standalone",
     orientation: "portrait",
-    background_color: "#0f0f0f",
-    theme_color: "#e85d26",
+    background_color: "#0c0b09",
+    theme_color: "#c8922a",
     categories: ["food", "lifestyle"],
     icons: [
       {
-        src: "https://cdn-icons-png.flaticon.com/512/3075/3075977.png",
+        src: "/icon-192.png",
         sizes: "192x192",
         type: "image/png",
       },
       {
-        src: "https://cdn-icons-png.flaticon.com/512/3075/3075977.png",
+        src: "/icon-512.png",
         sizes: "512x512",
         type: "image/png",
+        purpose: "any maskable",
       },
     ],
     shortcuts: [
