@@ -7,8 +7,6 @@ import { createClient } from "@/lib/supabase-client";
 
 /* ─── Nav interno (app) ─── */
 const APP_NAV = [
-  { href: "/menu",     label: "Menú",     icon: "🍽️" },
-  { href: "/pedidos",  label: "Pedidos",  icon: "📋" },
   { href: "/reservar", label: "Reservar", icon: "🪑" },
   { href: "/reservas", label: "Reservas", icon: "📅" },
 ];

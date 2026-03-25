@@ -68,7 +68,7 @@ export default function InstallBanner() {
         }}
       >
         {/* Icono */}
-        <img src="/icon-192.png" alt="La Mesa" className="w-12 h-12 rounded-xl flex-shrink-0" />
+        <img src="/icon.svg" alt="La Mesa" className="w-12 h-12 rounded-xl flex-shrink-0" />
 
         {/* Texto */}
         <div className="flex-1 min-w-0">
