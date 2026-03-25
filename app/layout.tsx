@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import SplashScreen from "@/components/SplashScreen";
+import InstallBanner from "@/components/InstallBanner";
 import "./globals.css";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
@@ -34,6 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen bg-[var(--bg)] text-[var(--text)] antialiased">
         <SplashScreen />
         {children}
+        <InstallBanner />
         <Toaster
           position="top-center"
           toastOptions={{
