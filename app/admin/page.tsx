@@ -2,12 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import AdminOrders from "@/components/admin/AdminOrders";
 import AdminReservations from "@/components/admin/AdminReservations";
-import AdminMenu from "@/components/admin/AdminMenu";
-import AdminCategories from "@/components/admin/AdminCategories";
 
-type Tab = "orders" | "reservations" | "menu" | "categories";
+type Tab = "reservations";
 
 export default function AdminPage() {
   const router = useRouter();
@@ -15,7 +12,7 @@ export default function AdminPage() {
   const [passcode, setPasscode] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [tab, setTab] = useState<Tab>("orders");
+  const [tab, setTab] = useState<Tab>("reservations");
   const [pendingReservationsCount, setPendingReservationsCount] = useState(0);
 
   useEffect(() => {
@@ -92,10 +89,7 @@ export default function AdminPage() {
   }
 
   const TABS: { key: Tab; label: string; icon: string }[] = [
-    { key: "orders",       label: "Pedidos",     icon: "📋" },
-    { key: "reservations", label: "Reservas",    icon: "🪑" },
-    { key: "menu",         label: "Menú",        icon: "🍽️" },
-    { key: "categories",   label: "Categorías",  icon: "🗂️" },
+    { key: "reservations", label: "Reservas", icon: "🪑" },
   ];
 
   return (
@@ -141,10 +135,7 @@ export default function AdminPage() {
       </div>
 
       <div className="max-w-3xl mx-auto px-4 py-6 pb-24">
-        {tab === "orders"       && <AdminOrders />}
         {tab === "reservations" && <AdminReservations />}
-        {tab === "menu"         && <AdminMenu />}
-        {tab === "categories"   && <AdminCategories />}
       </div>
     </main>
   );
