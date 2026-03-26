@@ -251,21 +251,34 @@ export default function Home() {
             {[
               {
                 num: "01",
-                icon: "👨‍🍳",
+                icon: (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-[var(--accent-light)]">
+                    <path d="M6 13.5V3.75m0 9.75a1.5 1.5 0 0 1 0 3m0-3a1.5 1.5 0 0 0 0 3m0 3.75V16.5m12-3V3.75m0 9.75a1.5 1.5 0 0 1 0 3m0-3a1.5 1.5 0 0 0 0 3m0 3.75V16.5m-6-9V3.75m0 3.75a1.5 1.5 0 0 1 0 3m0-3a1.5 1.5 0 0 0 0 3m0 9.75V10.5" />
+                  </svg>
+                ),
                 title: "Chefs Expertos",
                 desc: "Equipo con más de 15 años de experiencia en cocina internacional y de autor.",
                 stat: "15+ años",
               },
               {
                 num: "02",
-                icon: "🌱",
+                icon: (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-[var(--accent-light)]">
+                    <path d="M12 3c-1.2 5.4-5 7.8-5 12a5 5 0 0 0 10 0c0-4.2-3.8-6.6-5-12Z" />
+                    <path d="M12 3c1 3.6 4 5.5 4 9" />
+                  </svg>
+                ),
                 title: "Ingredientes Locales",
                 desc: "Trabajamos con productores locales para garantizar frescura y calidad en cada platillo.",
                 stat: "100% fresco",
               },
               {
                 num: "03",
-                icon: "❤️",
+                icon: (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-[var(--accent-light)]">
+                    <path d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                  </svg>
+                ),
                 title: "Pasión por Servir",
                 desc: "Cada platillo es preparado con dedicación y amor por lo que hacemos.",
                 stat: "4.9 ★",
@@ -291,7 +304,7 @@ export default function Home() {
 
                 {/* Icono */}
                 <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl mb-6 flex-shrink-0"
+                  className="w-12 h-12 rounded-xl flex items-center justify-center mb-6 flex-shrink-0"
                   style={{ background: "var(--accent-dim)", border: "1px solid rgba(200,146,42,0.2)" }}
                 >
                   {item.icon}
@@ -345,87 +358,125 @@ export default function Home() {
       </section>
 
       {/* ─── CONTACTO ─── */}
-      <section id="contacto" className="bg-[var(--surface)] py-24 px-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-16">
-            <p className="font-display italic text-[var(--accent-light)] text-sm mb-3">Encuéntranos</p>
+      <section id="contacto" className="bg-[var(--bg)] py-28 px-6 overflow-hidden">
+        <div className="max-w-5xl mx-auto">
+
+          {/* Header */}
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-8 h-px bg-[var(--accent)]" />
+            <p className="font-display italic text-[var(--accent-light)] text-sm">Visítanos</p>
+          </div>
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
             <h2 className="font-display text-4xl md:text-5xl font-bold text-[var(--text)] leading-tight">
-              Contacto
+              Estamos aquí<br />para recibirte
             </h2>
+            <p className="text-[var(--text-muted)] text-sm max-w-xs leading-relaxed">
+              Reserva tu mesa o simplemente pasa. Siempre hay un lugar para ti en La Mesa.
+            </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Info */}
-            <div className="flex flex-col gap-6">
-              {[
-                {
-                  icon: "📍",
-                  label: "Dirección",
-                  value: "Av. Principal 123, Centro Histórico",
-                  sub: "Ciudad de México, 06000",
-                },
-                {
-                  icon: "📞",
-                  label: "Teléfono",
-                  value: "+52 55 1234 5678",
-                  sub: "Lun–Dom · 1:00pm – 11:00pm",
-                },
-                {
-                  icon: "✉️",
-                  label: "Email",
-                  value: "hola@lamesa.com",
-                  sub: "Respuesta en menos de 24 horas",
-                },
-              ].map((item) => (
-                <div key={item.label} className="flex items-start gap-4">
-                  <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
-                    style={{ background: "var(--accent-dim)", border: "1px solid var(--border)" }}
-                  >
-                    {item.icon}
+          {/* Grid principal */}
+          <div className="grid md:grid-cols-3 gap-4">
+
+            {/* Dirección — card grande con mapa placeholder */}
+            <div className="md:col-span-2 relative rounded-2xl overflow-hidden min-h-[260px] group"
+              style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
+              {/* Fondo tipo mapa abstracto */}
+              <div className="absolute inset-0 opacity-10"
+                style={{
+                  backgroundImage: "radial-gradient(circle at 30% 50%, var(--accent) 1px, transparent 1px), radial-gradient(circle at 70% 30%, var(--accent) 1px, transparent 1px)",
+                  backgroundSize: "40px 40px",
+                }} />
+              <div className="absolute inset-0"
+                style={{ background: "linear-gradient(135deg, transparent 60%, rgba(200,146,42,0.06) 100%)" }} />
+
+              <div className="relative p-8 h-full flex flex-col justify-between">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+                    style={{ background: "var(--accent-dim)", border: "1px solid rgba(200,146,42,0.25)" }}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5" style={{ color: "var(--accent-light)" }}>
+                      <path d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                      <path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                    </svg>
                   </div>
-                  <div>
-                    <p className="text-[10px] uppercase tracking-widest mb-1" style={{ color: "var(--text-subtle)" }}>
-                      {item.label}
-                    </p>
-                    <p className="text-sm font-semibold mb-0.5" style={{ color: "var(--text)" }}>
-                      {item.value}
-                    </p>
-                    <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-                      {item.sub}
-                    </p>
-                  </div>
+                  <span className="text-[10px] uppercase tracking-widest" style={{ color: "var(--text-subtle)" }}>Ubicación</span>
                 </div>
-              ))}
+
+                <div>
+                  <p className="font-display text-2xl font-bold mb-1" style={{ color: "var(--text)" }}>
+                    Av. Principal 123
+                  </p>
+                  <p className="text-sm mb-1" style={{ color: "var(--text-muted)" }}>Centro Histórico</p>
+                  <p className="text-xs" style={{ color: "var(--text-subtle)" }}>Ciudad de México, 06000</p>
+                </div>
+
+                {/* Línea decorativa */}
+                <div className="absolute bottom-0 left-0 right-0 h-px"
+                  style={{ background: "linear-gradient(90deg, transparent, var(--accent), transparent)" }} />
+              </div>
             </div>
 
-            {/* Horarios */}
-            <div className="card p-6">
-              <h3 className="font-display text-lg font-bold mb-4" style={{ color: "var(--text)" }}>
-                Horarios
-              </h3>
-              <div className="flex flex-col gap-3">
-                {[
-                  { day: "Lunes – Jueves", hours: "1:00pm – 10:00pm" },
-                  { day: "Viernes – Sábado", hours: "1:00pm – 11:00pm" },
-                  { day: "Domingo", hours: "12:00pm – 9:00pm" },
-                ].map((item) => (
-                  <div key={item.day} className="flex justify-between items-center py-2 border-b border-[var(--border)] last:border-0">
-                    <span className="text-sm" style={{ color: "var(--text-muted)" }}>
-                      {item.day}
-                    </span>
-                    <span className="text-sm font-semibold" style={{ color: "var(--accent-light)" }}>
-                      {item.hours}
-                    </span>
-                  </div>
-                ))}
+            {/* Columna derecha — teléfono + email */}
+            <div className="flex flex-col gap-4">
+              <div className="flex-1 rounded-2xl p-6 flex flex-col justify-between"
+                style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
+                <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-4"
+                  style={{ background: "var(--accent-dim)", border: "1px solid rgba(200,146,42,0.25)" }}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5" style={{ color: "var(--accent-light)" }}>
+                    <path d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-widest mb-2" style={{ color: "var(--text-subtle)" }}>Teléfono</p>
+                  <p className="font-display text-base font-bold mb-1" style={{ color: "var(--text)" }}>+52 55 1234 5678</p>
+                  <p className="text-xs" style={{ color: "var(--text-muted)" }}>Lun–Dom · 1:00pm – 11:00pm</p>
+                </div>
               </div>
-              <div className="mt-6 pt-6 border-t border-[var(--border)]">
-                <Link href="/reservar" className="btn-primary w-full text-sm">
-                  Hacer una reserva
+
+              <div className="flex-1 rounded-2xl p-6 flex flex-col justify-between"
+                style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
+                <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-4"
+                  style={{ background: "var(--accent-dim)", border: "1px solid rgba(200,146,42,0.25)" }}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5" style={{ color: "var(--accent-light)" }}>
+                    <path d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-widest mb-2" style={{ color: "var(--text-subtle)" }}>Email</p>
+                  <p className="font-display text-base font-bold mb-1" style={{ color: "var(--text)" }}>hola@lamesa.com</p>
+                  <p className="text-xs" style={{ color: "var(--text-muted)" }}>Respuesta en menos de 24h</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Horarios — fila completa */}
+            <div className="md:col-span-3 rounded-2xl p-8"
+              style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+                <div>
+                  <p className="text-[10px] uppercase tracking-widest mb-3" style={{ color: "var(--text-subtle)" }}>Horarios</p>
+                  <div className="flex flex-col sm:flex-row gap-6">
+                    {[
+                      { day: "Lun – Jue", hours: "1:00 – 10:00pm" },
+                      { day: "Vie – Sáb", hours: "1:00 – 11:00pm" },
+                      { day: "Domingo", hours: "12:00 – 9:00pm" },
+                    ].map((item, i) => (
+                      <div key={item.day} className="flex items-center gap-4">
+                        {i > 0 && <div className="hidden sm:block w-px h-8" style={{ background: "var(--border)" }} />}
+                        <div>
+                          <p className="text-xs mb-0.5" style={{ color: "var(--text-subtle)" }}>{item.day}</p>
+                          <p className="font-display text-base font-bold" style={{ color: "var(--accent-light)" }}>{item.hours}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <Link href="/reservar" className="btn-primary text-sm flex-shrink-0 self-start md:self-auto">
+                  Reservar mesa →
                 </Link>
               </div>
             </div>
+
           </div>
         </div>
       </section>
