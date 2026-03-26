@@ -13,10 +13,6 @@ export default function InstallBanner() {
   const [isIOS, setIsIOS] = useState(false);
 
   useEffect(() => {
-    // Solo mostrar en mobile
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    if (!isMobile) return;
-
     // No mostrar si ya está instalada como PWA
     if (window.matchMedia("(display-mode: standalone)").matches) return;
 
@@ -68,7 +64,7 @@ export default function InstallBanner() {
         }}
       >
         {/* Icono */}
-        <img src="/icon.svg" alt="La Mesa" className="w-12 h-12 rounded-xl flex-shrink-0" />
+        <img src="/lamesaicon.jpg" alt="La Mesa" className="w-12 h-12 rounded-xl flex-shrink-0 object-cover" />
 
         {/* Texto */}
         <div className="flex-1 min-w-0">
