@@ -22,7 +22,13 @@ export default function manifest(): MetadataRoute.Manifest {
         src: "/lamesaicon.jpg",
         sizes: "512x512",
         type: "image/jpeg",
-        purpose: "any maskable",
+        purpose: "any",
+      },
+      {
+        src: "/lamesaicon.jpg",
+        sizes: "512x512",
+        type: "image/jpeg",
+        purpose: "maskable",
       },
     ],
     shortcuts: [
