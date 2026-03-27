@@ -51,21 +51,21 @@ export default function Home() {
             </h1>
 
             <p className="text-white/60 text-sm md:text-base max-w-xs leading-relaxed mb-10">
-              Explora nuestro menú, haz tu pedido y reserva tu mesa — todo desde aquí.
+              Haz tu reserva y disfruta una experiencia única — todo desde aquí.
             </p>
 
             <div className="flex items-center gap-4">
               <Link
-                href="/menu"
+                href="/reservar"
                 className="btn-primary text-sm"
               >
-                Ver Menú
+                Reservar Mesa
               </Link>
               <Link
-                href="/reservar"
+                href="/#nosotros"
                 className="group flex items-center gap-2 text-sm text-white/70 hover:text-white transition-colors"
               >
-                Reservar Mesa
+                Conocer más
                 <span className="w-6 h-px bg-white/40 group-hover:w-10 group-hover:bg-white transition-all duration-300" />
               </Link>
             </div>
@@ -86,7 +86,6 @@ export default function Home() {
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-6 overflow-x-auto no-scrollbar">
           {[
             { num: "12+", label: "Años de experiencia" },
-            { num: "80+", label: "Platillos en carta" },
             { num: "4.9", label: "Calificación promedio" },
             { num: "200", label: "Mesas reservadas hoy" },
           ].map((s, i) => (
@@ -95,7 +94,7 @@ export default function Home() {
                 <p className="font-display text-2xl font-bold text-white leading-none">{s.num}</p>
                 <p className="text-white/70 text-[11px] mt-0.5 whitespace-nowrap">{s.label}</p>
               </div>
-              {i < 3 && <div className="w-px h-8 bg-white/30 flex-shrink-0" />}
+              {i < 2 && <div className="w-px h-8 bg-white/30 flex-shrink-0" />}
             </div>
           ))}
         </div>
@@ -150,8 +149,8 @@ export default function Home() {
               ))}
             </ul>
 
-            <Link href="/menu" className="btn-outline self-start text-sm">
-              Explorar carta →
+            <Link href="/reservar" className="btn-outline self-start text-sm">
+              Hacer una reserva →
             </Link>
           </div>
         </div>
@@ -168,8 +167,8 @@ export default function Home() {
                 Prueba nuestra<br />oferta especial
               </h2>
             </div>
-            <Link href="/menu" className="btn-primary text-sm self-start md:self-auto flex-shrink-0">
-              Ver Menú
+            <Link href="/reservar" className="btn-primary text-sm self-start md:self-auto flex-shrink-0">
+              Reservar Mesa
             </Link>
           </div>
 
@@ -490,9 +489,8 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-8">
             {[
-              { href: "/menu",    label: "Menú" },
-              { href: "/reservar",label: "Reservar" },
-              { href: "/pedidos", label: "Pedidos" },
+              { href: "/reservar", label: "Reservar" },
+              { href: "/reservas", label: "Mis Reservas" },
             ].map((l) => (
               <Link key={l.href} href={l.href} className="text-xs text-[var(--text-muted)] hover:text-[var(--accent-light)] transition-colors tracking-wide">
                 {l.label}
