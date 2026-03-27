@@ -8,10 +8,16 @@ self.addEventListener("push", (event) => {
   event.waitUntil(
     self.registration.showNotification(payload.title, {
       body: payload.body,
-      icon: "/icon-192.png",
-      badge: "/icon-192.png",
+      icon: "/lamesaicon.jpg",
+      badge: "/lamesaicon.jpg",
       vibrate: [200, 100, 200],
+      sound: "/notification.wav",
       data: { url: payload.url },
+    }).then(() => {
+      // Reproducir sonido en clientes activos
+      return self.clients.matchAll({ type: "window" }).then((list) => {
+        list.forEach((client) => client.postMessage({ type: "PLAY_SOUND" }));
+      });
     })
   );
 });

@@ -31,6 +31,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="es" className={inter.variable}>
       <head>
         <link rel="apple-touch-icon" href="/lamesaicon.jpg" />
+        <script dangerouslySetInnerHTML={{ __html: `
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.addEventListener('message', (e) => {
+              if (e.data?.type === 'PLAY_SOUND') {
+                try { new Audio('/notification.wav').play(); } catch {}
+              }
+            });
+          }
+        `}} />
       </head>
       <body className="min-h-screen bg-[var(--bg)] text-[var(--text)] antialiased">
         <SplashScreen />
