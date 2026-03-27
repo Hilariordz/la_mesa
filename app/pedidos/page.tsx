@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
+import { fetchWithOfflineFallback } from "@/lib/offline-data";
 
 type Order = {
   id: string;
@@ -27,10 +28,16 @@ export default function OrdersPage() {
   const [unauthorized, setUnauthorized] = useState(false);
 
   useEffect(() => {
-    fetch("/api/orders")
-      .then((r) => { if (r.status === 401) { setUnauthorized(true); return null; } return r.json(); })
-      .then((data) => { if (data?.ok) setOrders(data.data); })
-      .finally(() => setLoading(false));
+    fetchWithOfflineFallback<{ ok: boolean; data: Order[] }>(
+      "user-orders",
+      () => fetch("/api/orders").then((r) => {
+        if (r.status === 401) { setUnauthorized(true); return { ok: false, data: [] }; }
+        return r.json();
+      }),
+      { cacheTime: 2 * 60 * 1000 }
+    ).then(({ data }) => {
+      if (data?.ok) setOrders(data.data);
+    }).finally(() => setLoading(false));
   }, []);
 
   const active = orders.filter((o) => !["delivered"].includes(o.status));

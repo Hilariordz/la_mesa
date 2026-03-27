@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import CartDrawer from "@/components/CartDrawer";
 import { useCart } from "@/lib/cart-store";
+import { fetchWithOfflineFallback } from "@/lib/offline-data";
 
 type Category = { id: string; name: string; emoji: string };
 type MenuItem = {
@@ -26,11 +27,19 @@ export default function MenuPage() {
 
   useEffect(() => {
     Promise.all([
-      fetch("/api/menu?type=categories").then((r) => r.ok ? r.json() : { ok: false, data: [] }),
-      fetch("/api/menu?type=items").then((r) => r.ok ? r.json() : { ok: false, data: [] }),
+      fetchWithOfflineFallback<{ ok: boolean; data: Category[] }>(
+        "menu-categories",
+        () => fetch("/api/menu?type=categories").then((r) => r.json()),
+        { cacheTime: 10 * 60 * 1000 }
+      ),
+      fetchWithOfflineFallback<{ ok: boolean; data: MenuItem[] }>(
+        "menu-items",
+        () => fetch("/api/menu?type=items").then((r) => r.json()),
+        { cacheTime: 10 * 60 * 1000 }
+      ),
     ]).then(([cats, its]) => {
-      setCategories(cats.data ?? []);
-      setItems(its.data ?? []);
+      setCategories(cats.data?.data ?? []);
+      setItems(its.data?.data ?? []);
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);

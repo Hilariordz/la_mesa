@@ -4,6 +4,7 @@ import { Toaster } from "react-hot-toast";
 import SplashScreen from "@/components/SplashScreen";
 import InstallBanner from "@/components/InstallBanner";
 import OfflineBanner from "@/components/OfflineBanner";
+import NotificationPrompt from "@/components/NotificationPrompt";
 import "./globals.css";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
@@ -62,6 +63,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {children}
         <OfflineBanner />
         <InstallBanner />
+        <NotificationPrompt />
         <Toaster
           position="top-center"
           toastOptions={{

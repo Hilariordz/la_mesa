@@ -5,6 +5,7 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import { usePushSubscription } from "@/lib/use-push";
 import toast from "react-hot-toast";
+import { fetchWithOfflineFallback } from "@/lib/offline-data";
 
 type Reservation = {
   id: string;
@@ -43,11 +44,17 @@ export default function ReservasPage() {
   const [editForm, setEditForm] = useState({ date: "", time: "", party_size: "2", notes: "" });
   const [saving, setSaving] = useState(false);
 
-  const load = () => {
-    fetch("/api/reservations")
-      .then((r) => { if (r.status === 401) { setUnauthorized(true); return null; } return r.json(); })
-      .then((data) => { if (data?.ok) setReservations(data.data); })
-      .finally(() => setLoading(false));
+  const load = (forceRefresh = false) => {
+    fetchWithOfflineFallback<{ ok: boolean; data: Reservation[] }>(
+      "user-reservations",
+      () => fetch("/api/reservations").then((r) => {
+        if (r.status === 401) { setUnauthorized(true); return { ok: false, data: [] }; }
+        return r.json();
+      }),
+      { cacheTime: 2 * 60 * 1000, forceRefresh }
+    ).then(({ data }) => {
+      if (data?.ok) setReservations(data.data);
+    }).finally(() => setLoading(false));
   };
 
   useEffect(() => { load(); }, []);
@@ -71,7 +78,7 @@ export default function ReservasPage() {
       if (!data.ok) throw new Error(data.message);
       toast.success("Reserva actualizada");
       setSelected(null);
-      load();
+      load(true);
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : "Error al guardar");
     } finally { setSaving(false); }
@@ -87,7 +94,7 @@ export default function ReservasPage() {
       if (!data.ok) throw new Error(data.message);
       toast.success("Reserva cancelada");
       setSelected(null);
-      load();
+      load(true);
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : "Error al cancelar");
     } finally { setSaving(false); }
