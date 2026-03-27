@@ -2,11 +2,9 @@
 const DATA_CACHE = "la-mesa-data-v1";
 const DATA_ROUTES = ["/api/reservations", "/api/orders", "/api/menu"];
 
-// Interceptar GETs de las APIs de datos
 self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
   const isDataRoute = DATA_ROUTES.some((r) => url.pathname.startsWith(r));
-
   if (!isDataRoute || event.request.method !== "GET") return;
 
   event.respondWith(
@@ -21,12 +19,22 @@ self.addEventListener("fetch", (event) => {
       .catch(async () => {
         const cached = await caches.match(event.request);
         if (cached) return cached;
-        // Sin caché y sin red — devolver respuesta vacía válida
         return new Response(JSON.stringify({ ok: true, data: [], offline: true }), {
           headers: { "Content-Type": "application/json" },
         });
       })
   );
+});
+
+// ── Background Sync — enviar reservas pendientes ──
+self.addEventListener("sync", (event) => {
+  if (event.tag === "sync-reservations") {
+    event.waitUntil(
+      self.clients.matchAll({ type: "window" }).then((list) => {
+        list.forEach((client) => client.postMessage({ type: "SYNC_RESERVATIONS" }));
+      })
+    );
+  }
 });
 
 // ── Push notifications ──

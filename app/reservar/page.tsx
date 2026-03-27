@@ -22,18 +22,39 @@ export default function ReservarPage() {
     if (!form.customer_name || !form.date || !form.time)
       return toast.error("Completa los campos requeridos");
     setStatus("loading");
+
+    const payload = { ...form, party_size: Number(form.party_size) };
+
+    // Sin conexión — guardar para sync posterior
+    if (!navigator.onLine) {
+      const pending = JSON.parse(localStorage.getItem("pending_reservations") ?? "[]");
+      pending.push({ ...payload, _savedAt: Date.now() });
+      localStorage.setItem("pending_reservations", JSON.stringify(pending));
+
+      // Registrar background sync si el navegador lo soporta
+      if ("serviceWorker" in navigator && "SyncManager" in window) {
+        const reg = await navigator.serviceWorker.ready;
+        await (reg as ServiceWorkerRegistration & { sync: { register: (tag: string) => Promise<void> } }).sync.register("sync-reservations");
+      }
+
+      toast.success("Sin conexión — tu reserva se enviará cuando vuelva internet", { duration: 5000 });
+      setStatus("idle");
+      return;
+    }
+
     try {
       const res = await fetch("/api/reservations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, party_size: Number(form.party_size) }),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (!data.ok) throw new Error(data.message);
       toast.success("¡Reserva enviada!");
       router.push("/reservas");
     } catch (e: unknown) {
-      toast.error(e instanceof Error ? e.message : "Error al reservar");
+      const msg = e instanceof Error ? e.message : "Error al reservar";
+      toast.error(msg);
       setStatus("idle");
     }
   };
