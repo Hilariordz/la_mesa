@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase-client";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
 
@@ -28,18 +27,10 @@ export default function OrdersPage() {
   const [unauthorized, setUnauthorized] = useState(false);
 
   useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getUser().then(async ({ data }) => {
-      if (!data.user) { setUnauthorized(true); setLoading(false); return; }
-      const { data: orders } = await supabase
-        .from("orders")
-        .select("id, status, customer_name, table_number, total, created_at")
-        .eq("user_id", data.user.id)
-        .order("created_at", { ascending: false })
-        .limit(20);
-      setOrders(orders ?? []);
-      setLoading(false);
-    });
+    fetch("/api/orders")
+      .then((r) => { if (r.status === 401) { setUnauthorized(true); return null; } return r.json(); })
+      .then((data) => { if (data?.ok) setOrders(data.data); })
+      .finally(() => setLoading(false));
   }, []);
 
   const active = orders.filter((o) => !["delivered"].includes(o.status));

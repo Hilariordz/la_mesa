@@ -1,4 +1,35 @@
-// Custom push handler — se importa desde el SW principal via next-pwa customWorkerSrc
+// ── Cache de datos dinámicos para offline ──
+const DATA_CACHE = "la-mesa-data-v1";
+const DATA_ROUTES = ["/api/reservations", "/api/orders", "/api/menu"];
+
+// Interceptar GETs de las APIs de datos
+self.addEventListener("fetch", (event) => {
+  const url = new URL(event.request.url);
+  const isDataRoute = DATA_ROUTES.some((r) => url.pathname.startsWith(r));
+
+  if (!isDataRoute || event.request.method !== "GET") return;
+
+  event.respondWith(
+    fetch(event.request.clone())
+      .then((response) => {
+        if (response.ok) {
+          const clone = response.clone();
+          caches.open(DATA_CACHE).then((cache) => cache.put(event.request, clone));
+        }
+        return response;
+      })
+      .catch(async () => {
+        const cached = await caches.match(event.request);
+        if (cached) return cached;
+        // Sin caché y sin red — devolver respuesta vacía válida
+        return new Response(JSON.stringify({ ok: true, data: [], offline: true }), {
+          headers: { "Content-Type": "application/json" },
+        });
+      })
+  );
+});
+
+// ── Push notifications ──
 self.addEventListener("push", (event) => {
   if (!event.data) return;
 
@@ -14,7 +45,6 @@ self.addEventListener("push", (event) => {
       sound: "/notification.wav",
       data: { url: payload.url },
     }).then(() => {
-      // Reproducir sonido en clientes activos
       return self.clients.matchAll({ type: "window" }).then((list) => {
         list.forEach((client) => client.postMessage({ type: "PLAY_SOUND" }));
       });

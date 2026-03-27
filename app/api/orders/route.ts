@@ -1,5 +1,36 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
+
+async function getUserId(): Promise<string | null> {
+  try {
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!,
+      { cookies: { get: (n) => cookieStore.get(n)?.value, set: () => {}, remove: () => {} } }
+    );
+    const { data } = await supabase.auth.getUser();
+    return data.user?.id ?? null;
+  } catch { return null; }
+}
+
+export async function GET() {
+  const userId = await getUserId();
+  if (!userId) return NextResponse.json({ ok: false, message: "No autenticado" }, { status: 401 });
+
+  const admin = getSupabaseAdminClient();
+  const { data, error } = await admin
+    .from("orders")
+    .select("id, status, customer_name, table_number, total, created_at")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false })
+    .limit(20);
+
+  if (error) return NextResponse.json({ ok: false, message: error.message }, { status: 500 });
+  return NextResponse.json({ ok: true, data: data ?? [] });
+}
 
 export async function POST(req: Request) {
   try {
