@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
 import { fetchWithOfflineFallback } from "@/lib/offline-data";
+import { createClient } from "@/lib/supabase-client";
 
 type Order = {
   id: string;
@@ -26,10 +27,18 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [unauthorized, setUnauthorized] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
+    createClient().auth.getUser().then(({ data }) => {
+      setUserId(data.user?.id ?? null);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (userId === null) return;
     fetchWithOfflineFallback<{ ok: boolean; data: Order[] }>(
-      "user-orders",
+      `user-orders-${userId}`,
       () => fetch("/api/orders").then((r) => {
         if (r.status === 401) { setUnauthorized(true); return { ok: false, data: [] }; }
         return r.json();
@@ -38,7 +47,7 @@ export default function OrdersPage() {
     ).then(({ data }) => {
       if (data?.ok) setOrders(data.data);
     }).finally(() => setLoading(false));
-  }, []);
+  }, [userId]);
 
   const active = orders.filter((o) => !["delivered"].includes(o.status));
   const past   = orders.filter((o) => ["delivered"].includes(o.status));

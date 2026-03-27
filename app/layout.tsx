@@ -39,23 +39,33 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               if (e.data?.type === 'PLAY_SOUND') {
                 try { new Audio('/notification.wav').play(); } catch {}
               }
-              if (e.data?.type === 'SYNC_RESERVATIONS') {
-                try {
-                  const pending = JSON.parse(localStorage.getItem('pending_reservations') || '[]');
-                  if (!pending.length) return;
-                  Promise.all(pending.map(function(p) {
-                    return fetch('/api/reservations', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify(p),
-                    }).then(function(r) { return r.json(); });
-                  })).then(function() {
-                    localStorage.removeItem('pending_reservations');
-                  }).catch(function() {});
-                } catch(e) {}
-              }
             });
           }
+
+          function syncPendingReservations() {
+            try {
+              const pending = JSON.parse(localStorage.getItem('pending_reservations') || '[]');
+              if (!pending.length) return;
+              Promise.all(pending.map(function(p) {
+                return fetch('/api/reservations', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(p),
+                }).then(function(r) { return r.json(); });
+              })).then(function() {
+                localStorage.removeItem('pending_reservations');
+                console.log('[sync] Reservas pendientes enviadas');
+              }).catch(function() {});
+            } catch(e) {}
+          }
+
+          // Sincronizar inmediatamente al recuperar conexión
+          window.addEventListener('online', function() {
+            syncPendingReservations();
+          });
+
+          // También al cargar si hay pendientes y hay conexión
+          if (navigator.onLine) syncPendingReservations();
         `}} />
       </head>
       <body className="min-h-screen bg-[var(--bg)] text-[var(--text)] antialiased">

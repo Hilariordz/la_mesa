@@ -79,7 +79,7 @@ export default function ReservarPage() {
       }
 
       toast.success("¡Reserva enviada!");
-      router.push("/reservas");
+      router.push("/reservas?refresh=1");
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Error al reservar";
       toast.error(msg);

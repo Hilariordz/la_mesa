@@ -6,6 +6,8 @@ import Navbar from "@/components/Navbar";
 import { usePushSubscription } from "@/lib/use-push";
 import toast from "react-hot-toast";
 import { fetchWithOfflineFallback } from "@/lib/offline-data";
+import { createClient } from "@/lib/supabase-client";
+import { useSearchParams } from "next/navigation";
 
 type Reservation = {
   id: string;
@@ -36,6 +38,7 @@ function minutesLeft(createdAt: string) {
 
 export default function ReservasPage() {
   usePushSubscription(false);
+  const searchParams = useSearchParams();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
   const [unauthorized, setUnauthorized] = useState(false);
@@ -43,10 +46,18 @@ export default function ReservasPage() {
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState({ date: "", time: "", party_size: "2", notes: "" });
   const [saving, setSaving] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    createClient().auth.getUser().then(({ data }) => {
+      setUserId(data.user?.id ?? null);
+    });
+  }, []);
 
   const load = (forceRefresh = false) => {
+    if (!userId) return;
     fetchWithOfflineFallback<{ ok: boolean; data: Reservation[] }>(
-      "user-reservations",
+      `user-reservations-${userId}`,
       () => fetch("/api/reservations").then((r) => {
         if (r.status === 401) { setUnauthorized(true); return { ok: false, data: [] }; }
         return r.json();
@@ -57,7 +68,9 @@ export default function ReservasPage() {
     }).finally(() => setLoading(false));
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    if (userId !== null) load(searchParams.get("refresh") === "1");
+  }, [userId]);
 
   const openModal = (r: Reservation) => {
     setSelected(r);

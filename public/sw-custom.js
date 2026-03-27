@@ -30,6 +30,7 @@ self.addEventListener("fetch", (event) => {
 self.addEventListener("sync", (event) => {
   if (event.tag === "sync-reservations") {
     event.waitUntil(
+      // Notificar al cliente para que sincronice (el cliente tiene acceso a localStorage)
       self.clients.matchAll({ type: "window" }).then((list) => {
         list.forEach((client) => client.postMessage({ type: "SYNC_RESERVATIONS" }));
       })
