@@ -23,7 +23,7 @@ export default function LoginPage() {
       const data = await res.json();
       if (!data.ok) throw new Error(data.message);
       toast.success("¡Bienvenido!");
-      router.push("/menu");
+      router.push("/reservas");
       router.refresh();
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : "Error al ingresar");
