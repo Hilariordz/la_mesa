@@ -94,6 +94,13 @@ export default function AdminReservations() {
   }, [fetchReservations]);
 
   const updateStatus = async (id: string, status: string) => {
+    // Actualización optimista — quitar de la lista si el filtro activo no la incluye
+    setReservations((prev) =>
+      filter === "all"
+        ? prev.map((r) => r.id === id ? { ...r, status } : r)
+        : prev.filter((r) => r.id !== id)
+    );
+
     const res = await fetch("/api/admin/reservations/status", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -102,9 +109,10 @@ export default function AdminReservations() {
     const data = await res.json();
     if (data.ok) {
       toast.success(status === "approved" ? "Reserva aprobada" : "Reserva rechazada");
-      setReservations((prev) => prev.map((r) => r.id === id ? { ...r, status } : r));
     } else {
       toast.error(data.message);
+      // Revertir si falló
+      fetchReservations();
     }
   };
 
