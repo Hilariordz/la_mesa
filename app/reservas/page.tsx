@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import { usePushSubscription } from "@/lib/use-push";
@@ -37,6 +37,14 @@ function minutesLeft(createdAt: string) {
 }
 
 export default function ReservasPage() {
+  return (
+    <Suspense>
+      <ReservasContent />
+    </Suspense>
+  );
+}
+
+function ReservasContent() {
   usePushSubscription(false);
   const searchParams = useSearchParams();
   const [reservations, setReservations] = useState<Reservation[]>([]);
